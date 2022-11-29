@@ -1631,6 +1631,9 @@ const menuitem_t menu_save[] = {
 #if SAVEAREA_MAX > 6
   { MT_ADV_CALLBACK, 6, MT_CUSTOM_LABEL, menu_save_acb },
 #endif
+#if SAVEAREA_MAX > 7
+  { MT_ADV_CALLBACK, 7, MT_CUSTOM_LABEL, menu_save_acb },
+#endif
   { MT_NONE, 0, NULL, menu_back } // next-> menu_back
 };
 
@@ -1652,6 +1655,9 @@ const menuitem_t menu_recall[] = {
 #endif
 #if SAVEAREA_MAX > 6
   { MT_ADV_CALLBACK, 6, MT_CUSTOM_LABEL, menu_recall_acb },
+#endif
+#if SAVEAREA_MAX > 7
+  { MT_ADV_CALLBACK, 7, MT_CUSTOM_LABEL, menu_recall_acb },
 #endif
   { MT_NONE, 0, NULL, menu_back } // next-> menu_back
 };

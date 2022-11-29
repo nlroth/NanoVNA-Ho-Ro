@@ -50,7 +50,7 @@
 // Add RTC backup registers support
 #define __USE_BACKUP__
 // Add SD card support, req enable RTC (additional settings for file system see FatFS lib ffconf.h)
-#define __USE_SD_CARD__
+//#define __USE_SD_CARD__
 // If enabled serial in halconf.h, possible enable serial console control
 #define __USE_SERIAL_CONSOLE__
 // Add show y grid line values option
@@ -264,8 +264,8 @@ typedef uint32_t freq_t;
 #define POINTS_SET             {51, 101, POINTS_COUNT}
 #define POINTS_COUNT_DEFAULT   POINTS_COUNT
 #elif POINTS_COUNT >=101
-#define POINTS_SET_COUNT       2
-#define POINTS_SET             {51, POINTS_COUNT}
+#define POINTS_SET_COUNT       4
+#define POINTS_SET             {51, POINTS_COUNT-10, POINTS_COUNT-1, POINTS_COUNT}
 #define POINTS_COUNT_DEFAULT   POINTS_COUNT
 #endif
 

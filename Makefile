@@ -67,7 +67,7 @@ endif
 ##############################################################################
 
 ifeq ($(VERSION),)
-  VERSION="$(shell git describe --tags)"
+VERSION = "$(shell grep -E '#define[[:space:]]+VERSION[[:space:]]+\"[0-9]*\.[0-9]*\.[0-9]*' main.c | cut -d\" -f2)"
 endif
 
 ##############################################################################
@@ -96,7 +96,11 @@ endif
 #
 
 # Define project name here
-PROJECT = ch
+ifeq ($(TARGET),F303)
+  PROJECT = NanoVNA-H4-noSD_$(VERSION)
+else
+  PROJECT = NanoVNA-H-noSD_$(VERSION)
+endif
 
 # Imported source files and paths
 #CHIBIOS = ../ChibiOS-RT
@@ -238,7 +242,7 @@ CPPWARN = -Wall -Wextra -Wundef
 ifeq ($(TARGET),F303)
  UDEFS = -DARM_MATH_CM4 -DVERSION=\"$(VERSION)\" -DNANOVNA_F303
 else
- UDEFS = -DARM_MATH_CM0 -DVERSION=\"$(VERSION)\" 
+ UDEFS = -DARM_MATH_CM0 -DVERSION=\"$(VERSION)\"
 endif
 #Enable if use RTC and need auto select source LSE or LSI
 UDEFS+= -DVNA_AUTO_SELECT_RTC_SOURCE
@@ -264,12 +268,40 @@ ULIBS = -lm
 
 RULESPATH = $(CHIBIOS)/os/common/startup/ARMCMx/compilers/GCC
 include $(RULESPATH)/rules.mk
+.PHONY: all
+all: bin hex
 
-flash: build/ch.bin
-	dfu-util -d 0483:df11 -a 0 -s 0x08000000:leave -D build/ch.bin
+# build the bin file needed for flash
+.PHONY: bin
+bin: build/$(PROJECT).bin
+	@cp $< .
 
+# build hex and dfu, show the remaining RAM space
+.PHONY: hex
+hex: build/$(PROJECT).hex
+	@cp $< .
+	@echo "\nCheck free RAM space (= .heap)\n"
+	@grep \\.heap build/$(PROJECT).map
+	@echo "\nCheck number of calibration slots\n"
+	@./get_SAVEAREA_MAX.sh
+	@echo "\nCreating $(PROJECT).dfu\n"
+	@hex2dfu -i $(PROJECT).hex -o $(PROJECT).dfu
+
+# download the bin file to the device flash
+.PHONY: flash
+flash: build/$(PROJECT).bin dfu
+	dfu-util -d 0483:df11 -a 0 -s 0x08000000:leave -D $<
+
+# switch device into DFU mode and wait to establish the DFU device
+.PHONY:	dfu
 dfu:
-	-@printf "reset dfu\r" >/dev/cu.usbmodem401
+	-@printf "\rreset dfu\r" >/dev/ttyACM0
+	@sleep 2
+
+# remove all build artifacts
+.phony: distclean
+distclean: clean
+	rm -f *.bin *.hex *.dfu
 
 TAGS: Makefile
 ifeq ($(TARGET),F303)

@@ -179,7 +179,11 @@ void initI2S(void *buffer, uint16_t count);
 
 #define FLASH_PAGESIZE 0x800
 
-#define SAVEAREA_MAX 5
+#ifdef __USE_SD_CARD__
+# define SAVEAREA_MAX 6
+#else
+# define SAVEAREA_MAX 8
+#endif
 
 // Depend from config_t size, should be aligned by FLASH_PAGESIZE
 #define SAVE_CONFIG_SIZE        0x00000800
@@ -190,10 +194,10 @@ void initI2S(void *buffer, uint16_t count);
 // Save config_t and properties_t flash area (see flash7 from *.ld settings)
 #define SAVE_FULL_AREA_SIZE     (SAVE_CONFIG_SIZE + SAVEAREA_MAX * SAVE_PROP_CONFIG_SIZE)
 // Save setting at end of CPU flash area
-// Config at end minus full size
-#define SAVE_CONFIG_ADDR        (FLASH_START_ADDRESS + FLASH_TOTAL_SIZE - SAVE_FULL_AREA_SIZE)
-// Properties save area follow after config
-#define SAVE_PROP_CONFIG_ADDR   (SAVE_CONFIG_ADDR + SAVE_CONFIG_SIZE)
+// Config at top minus config size
+#define SAVE_CONFIG_ADDR        (FLASH_START_ADDRESS + FLASH_TOTAL_SIZE - SAVE_CONFIG_SIZE)
+// Properties save area follow below config (top down)
+#define SAVE_PROP_CONFIG_ADDR   (FLASH_START_ADDRESS + FLASH_TOTAL_SIZE - SAVE_FULL_AREA_SIZE)
 
 // Erase settings on page
 void flash_erase_pages(uint32_t page_address, uint32_t size);

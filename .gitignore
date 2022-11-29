@@ -1,11 +1,11 @@
+.*~
 *~
-.DS_Store
 .dep
 build*
 test
 python
-*.py
-*.ipynb
 TAGS
-.emacs-dirvars
-*png
+*.png
+*.new
+*.old
+*.orig
